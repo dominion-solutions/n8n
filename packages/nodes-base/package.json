@@ -113,6 +113,7 @@
             "dist/nodes/Clearbit/Clearbit.node.js",
             "dist/nodes/ClickUp/ClickUp.node.js",
             "dist/nodes/ClickUp/ClickUpTrigger.node.js",
+		  	"dist/nodes/Clockify/ClockifyTimeEntry.node.js",
 		  	"dist/nodes/Clockify/ClockifyTrigger.node.js",
             "dist/nodes/Coda/Coda.node.js",
             "dist/nodes/Copper/CopperTrigger.node.js",
