@@ -121,6 +121,5 @@ export class ClockifyTrigger implements INodeType {
 			return result;
 		}
 		return result;
-
 	}
 }
