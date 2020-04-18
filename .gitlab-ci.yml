@@ -7,7 +7,7 @@ docker-build-master:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker build -f docker/images/n8n/Dockerfile --pull -t "$CI_REGISTRY_IMAGE" --build-arg N8N_VERSION=$CI_COMMIT_REF_SLUG .
     - docker push "$CI_REGISTRY_IMAGE"
   only:
     - develop
@@ -21,7 +21,7 @@ docker-build:
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
-    - docker build -f docker/images/n8n/Dockerfile -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
+    - docker build -f docker/images/n8n/Dockerfile --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" --build-arg N8N_VERSION=$CI_COMMIT_REF_SLUG .
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   except:
     - develop
