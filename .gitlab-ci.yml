@@ -2,7 +2,7 @@ build:
   image: node:12.16-alpine
   stage: build
   script:
-    - npm publish @n8n/"0.63.0-$CI_COMMIT_REF_SLUG" --tag
+    - npm publish @n8n/"0.63.0-${CI_COMMIT_REF_SLUG}" --tag
   except:
     - develop
 docker-build-master:
@@ -15,7 +15,7 @@ docker-build-master:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
   script:
     - npm publish
-    - docker build -f docker/images/n8n/Dockerfile --pull -t "$CI_REGISTRY_IMAGE" --build-arg N8N_VERSION="0.63.0-$CI_COMMIT_REF_SLUG" .
+    - docker build -f docker/images/n8n/Dockerfile --pull -t "$CI_REGISTRY_IMAGE" --build-arg N8N_VERSION="0.63.0-${CI_COMMIT_REF_SLUG}" .
     - docker push "$CI_REGISTRY_IMAGE"
   only:
     - develop
