@@ -2,7 +2,7 @@ build:
   image: node:12.16-alpine
   stage: build
   script:
-    - npm publish @n8n/"0.63.0-${CI_COMMIT_BRANCH}"
+    - npm publish @dominion-solutions/n8n
   except:
     - develop
 
@@ -34,3 +34,4 @@ docker-build:
     - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
   except:
     - develop
+    - gitlab_ci
