@@ -2,7 +2,7 @@ build:
   image: node:12.16-alpine
   stage: build
   script:
-    - npm publish @n8n/"0.63.0-${CI_COMMIT_BRANCH}" --tag
+    - npm publish @n8n/"0.63.0-${CI_COMMIT_BRANCH}"
   except:
     - develop
 
