@@ -7,7 +7,6 @@ import {
 
 import { IDataObject } from 'n8n-workflow';
 import {IProjectDto} from "./ProjectInterfaces";
-import {find} from "lodash";
 
 export async function clockifyApiRequest(this: ILoadOptionsFunctions | IPollFunctions | IExecuteFunctions, method: string, resource: string, body: any = {}, qs: IDataObject = {}, uri?: string, option: IDataObject = {}): Promise<any> { // tslint:disable-line:no-any
 	const credentials = this.getCredentials('clockifyApi');
@@ -45,16 +44,19 @@ export async function clockifyApiRequest(this: ILoadOptionsFunctions | IPollFunc
 export async function findProjectByName(this: IExecuteFunctions | ILoadOptionsFunctions, workspaceId: number, projectName: string, clientId: string): Promise<IProjectDto | undefined> {
 	const resource = `workspaces/${workspaceId}/projects`;
 	const qs: IDataObject = {};
+	let rtv = undefined;
 	//Clockify requires replacing spaces with +
 	qs.name = projectName.trim().replace(/\s/g, '+');
 
 	//For the life of me, I cannot figure out why the query string never gets processed if I pass it in in the qs variable
-	let result = await clockifyApiRequest.call(this, 'GET', `${resource}?name=${qs.name}`);
-	result = find(result,
-		{
-			"clientId": clientId
-		});
-	return result;
+	const result = await clockifyApiRequest.call(this, 'GET', `${resource}?name=${qs.name}`);
+
+	for(const project of result){
+		if(project.clientId === clientId) {
+			rtv = project;
+		}
+	}
+	return rtv;
 }
 
 export async function createProject(this:IExecuteFunctions, project: IProjectDto ): Promise<IProjectDto> {

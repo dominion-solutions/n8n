@@ -16,8 +16,5 @@
     "lerna": "^3.13.1",
     "run-script-os": "^1.0.7"
   },
-  "postcss": {},
-  "publishConfig": {
-	"@npm:registry":"https://gitlab.com/api/v4/projects/18216776/packages/npm/"
-  },
+  "postcss": {}
 }
