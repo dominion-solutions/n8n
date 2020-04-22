@@ -1,6 +1,5 @@
-import {IExecuteFunctions, IExecuteSingleFunctions} from 'n8n-core';
+import {IExecuteFunctions} from 'n8n-core';
 import {
-	IDataObject,
 	ILoadOptionsFunctions,
 	INodeExecutionData, INodePropertyOptions,
 	INodeType,
@@ -13,12 +12,9 @@ import {
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
 import {IUserDto} from "./UserDtos";
-import {runInThisContext} from "vm";
 import {IProjectDto, ITaskDto} from "./ProjectInterfaces";
 import {ITagDto} from "./CommonDtos";
-import {ITimeEntryDto, ITimeEntryRequest} from "./TimeEntryInterfaces";
-import {stringify} from "querystring";
-import {callbackify} from "util";
+import {ITimeEntryRequest} from "./TimeEntryInterfaces";
 
 export class NewClockifyEntry implements INodeType {
 	description: INodeTypeDescription = {
@@ -262,6 +258,7 @@ export class NewClockifyEntry implements INodeType {
 
 		const items = this.getInputData();
 		const timeEntries : INodeExecutionData[] = [];
+		const currUserId = this.getNodeParameter('userId', itemIndex) as string;
 		let timeEntryRequest : ITimeEntryRequest;
 		// Itterates over all input items and add the key "myString" with the
 		// value the parameter "myString" resolves to.
@@ -300,7 +297,7 @@ export class NewClockifyEntry implements INodeType {
 				billable: isBillable,
 				projectId: currProjectId,
 				isLocked: false,
-				userId: this.getNodeParameter('userId', itemIndex) as string,
+				userId: currUserId,
 				workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
 				start: this.getNodeParameter('start', itemIndex) as string,
 				end: this.getNodeParameter('end', itemIndex) as string,
@@ -318,7 +315,7 @@ export class NewClockifyEntry implements INodeType {
 			if( currTaskId.length !== 0) {
 				timeEntryRequest.taskId = currTaskId as string;
 			}
-			const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/time-entries`, timeEntryRequest);
+			const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/user/${currUserId}/time-entries`, timeEntryRequest);
 			timeEntries.push(timeEntry);
 		}
 		return this.prepareOutputData(timeEntries);
