@@ -433,13 +433,13 @@ export class ClockifyWriter implements INodeType {
 			const resource = this.getNodeParameter('resource', itemIndex) as string;
 
 			if ( resource === 'project' ) {
+				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
 				const projectName = this.getNodeParameter('projectName', itemIndex) as string;
+				const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
+				const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
-				if ( operation === 'create' && !project) {
-					const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
-					const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
-					const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 
+				if ( operation === 'create' && !project) {
 					project = {
 						clientName: "",
 						color: this.getNodeParameter('color', itemIndex) as string,
