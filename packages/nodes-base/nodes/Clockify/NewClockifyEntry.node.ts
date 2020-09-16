@@ -323,19 +323,5 @@ export class NewClockifyEntry implements INodeType {
 			timeEntries.push(timeEntry);
 		}
 		return this.prepareOutputData(timeEntries);
-					start: this.getNodeParameter('start', itemIndex) as string,
-					end: this.getNodeParameter('end', itemIndex) as string,
-				},
-			};
-			// const tagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
-			// if (tagIds.length !== 0){
-			// 	timeEntryRequest.tagId = tagIds;
-			// }
-			console.log(timeEntryRequest);
-			const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/time-entries`, timeEntryRequest);
-			console.log(timeEntry);
-			timeEntries.push(timeEntry);
-		}
-		return this.prepareOutputData(timeEntries);
 	}
 }

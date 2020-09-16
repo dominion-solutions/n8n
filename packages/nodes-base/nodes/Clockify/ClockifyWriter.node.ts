@@ -449,7 +449,7 @@ export class ClockifyWriter implements INodeType {
 					const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
 					const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 
-					project = {  //
+					project = {
 						clientName: "",
 						color: this.getNodeParameter('color', itemIndex) as string,
 						duration: "",
