@@ -472,6 +472,8 @@ export class ClockifyWriter implements INodeType {
 
 				}else if ( operation === 'delete' ) {
 
+				}else {
+					result = project;
 				}
 			} else if( resource === 'tag'){
 				if ( operation === 'create' ) {
