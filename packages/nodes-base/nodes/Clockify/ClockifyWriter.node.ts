@@ -465,8 +465,13 @@ export class ClockifyWriter implements INodeType {
 
 				}else if ( operation === 'delete' ) {
 
+<<<<<<< HEAD
 				}else{
 					result.push(project);
+=======
+				}else {
+					result = project;
+>>>>>>> Now returns existing project if you try to make a duplicate
 				}
 			} else if( resource === 'tag'){
 				const tagName = this.getNodeParameter('tagName', itemIndex) as [];
