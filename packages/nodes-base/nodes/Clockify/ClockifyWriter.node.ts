@@ -8,7 +8,7 @@ import {
 } from 'n8n-workflow';
 
 import {
-	clockifyApiRequest, createProject, findProjectByName,
+	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag
 } from './GenericFunctions';
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
@@ -135,9 +135,9 @@ export class ClockifyWriter implements INodeType {
 				default: [],
 				description: 'Project to associate with, leaving blank will use the project associated with the task.',
 				displayOptions: {
-					hide: {
+					show: {
 						resource: [
-							'project',
+							'timeEntry',
 						],
 					},
 				}
@@ -440,15 +440,15 @@ export class ClockifyWriter implements INodeType {
 			const currClientId = this.getNodeParameter('clientId', itemIndex) as string;
 			const operation = this.getNodeParameter('operation', itemIndex) as string;
 			const resource = this.getNodeParameter('resource', itemIndex) as string;
-			const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
-			const projectName = this.getNodeParameter('projectName', itemIndex) as string;
 
 			if ( resource === 'project' ) {
+				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
+				const projectName = this.getNodeParameter('projectName', itemIndex) as string;
+				const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
+				const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
-				if ( operation === 'create' && !project) {
-					const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
-					const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 
+				if ( operation === 'create' && !project) {
 					project = {
 						clientName: "",
 						color: this.getNodeParameter('color', itemIndex) as string,
@@ -476,15 +476,29 @@ export class ClockifyWriter implements INodeType {
 					result = project;
 				}
 			} else if( resource === 'tag'){
-				if ( operation === 'create' ) {
+				const tagName = this.getNodeParameter('tagName', itemIndex) as string;
+				let tag = await findTagByName.call(this, currWorkspaceId, tagName);
 
+				if ( operation === 'create' && !tag) {
+					tag = {
+						id: "",
+						name: tagName,
+						workspaceId: currWorkspaceId.toString()
+					}
+
+					result = await createTag.call(this, tag);
+					console.log(`Tag Created: ${result}`);
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
 
+				}else {
+					result = tag;
 				}
 			} else if( resource === 'timeEntry'){
-				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
+				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
+				const projectCurrent = this.getNodeParameter('project', itemIndex) as string;
+				let project = await findProjectByName.call(this, currWorkspaceId, projectCurrent, currClientId);
 
 				if ( operation === 'create' ) {
 					// const currProjectId = (project as IProjectDto).id;
