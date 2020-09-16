@@ -5,7 +5,7 @@ import {
 	IPollFunctions
 } from 'n8n-core';
 
-import { IDataObject } from 'n8n-workflow';
+import { IDataObject, INodeExecutionData } from 'n8n-workflow';
 import {IProjectDto} from "./ProjectInterfaces";
 import {find} from "lodash";
 
@@ -57,7 +57,7 @@ export async function findProjectByName(this: IExecuteFunctions | ILoadOptionsFu
 	return result;
 }
 
-export async function createProject(this:IExecuteFunctions, project: IProjectDto ): Promise<IProjectDto> {
+export async function createProject(this:IExecuteFunctions, project: IProjectDto ): Promise<INodeExecutionData> {
 	const resource = `workspaces/${project.workspaceId}/projects`;
 	return await clockifyApiRequest.call(this, 'POST', resource, project);
 }
