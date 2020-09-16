@@ -438,7 +438,10 @@ export class ClockifyWriter implements INodeType {
 				const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
 				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
 
+<<<<<<< HEAD
 				if ( operation === 'create' && !project) {
+=======
+>>>>>>> Fixed problem from mergetool
 					project = {
 						clientName: "",
 						color: this.getNodeParameter('color', itemIndex) as string,
