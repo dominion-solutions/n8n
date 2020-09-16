@@ -8,7 +8,11 @@ import {
 } from 'n8n-workflow';
 
 import {
+<<<<<<< HEAD
 	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag, createTimeEntry
+=======
+	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag
+>>>>>>> Edited ClockifyWriter to add Tag creation
 } from './GenericFunctions';
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
@@ -125,10 +129,14 @@ export class ClockifyWriter implements INodeType {
 				default: [],
 				description: 'Project to associate with, leaving blank will use the project associated with the task.',
 				displayOptions: {
-					hide: {
+					show: {
 						resource: [
+<<<<<<< HEAD
 							'project',
 							'tag',
+=======
+							'timeEntry',
+>>>>>>> Edited ClockifyWriter to add Tag creation
 						],
 					},
 				}
@@ -439,9 +447,13 @@ export class ClockifyWriter implements INodeType {
 				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 				if ( operation === 'create' && !project) {
 =======
 >>>>>>> Fixed problem from mergetool
+=======
+				if ( operation === 'create' && !project) {
+>>>>>>> Edited ClockifyWriter to add Tag creation
 					project = {
 						clientName: "",
 						color: this.getNodeParameter('color', itemIndex) as string,
@@ -474,6 +486,7 @@ export class ClockifyWriter implements INodeType {
 >>>>>>> Now returns existing project if you try to make a duplicate
 				}
 			} else if( resource === 'tag'){
+<<<<<<< HEAD
 				const tagName = this.getNodeParameter('tagName', itemIndex) as [];
 				let tagsArr : ITagDto[] = [];
 				if (!tagName){
@@ -492,6 +505,21 @@ export class ClockifyWriter implements INodeType {
 
 				for(let index = 0; index < tagsArr.length; index++){
 					let tag = await findTagByName.call(this, currWorkspaceId, tagsArr[index].name);
+=======
+				const tagName = this.getNodeParameter('tagName', itemIndex) as string;
+				let tag = await findTagByName.call(this, currWorkspaceId, tagName);
+
+				if ( operation === 'create' && !tag) {
+					tag = {
+						id: "",
+						name: tagName,
+						workspaceId: currWorkspaceId.toString()
+					}
+
+					result = await createTag.call(this, tag);
+					console.log(`Tag Created: ${result}`);
+				}else if ( operation === 'update' ) {
+>>>>>>> Edited ClockifyWriter to add Tag creation
 
 					if ( operation === 'create' && !tag) {
 						tag = {
@@ -501,6 +529,7 @@ export class ClockifyWriter implements INodeType {
 							archived: false
 						}
 
+<<<<<<< HEAD
 						result.push(await createTag.call(this, tag));
 						console.log(`Tag Created: ${result}`);
 					}else if ( operation === 'update' ) {
@@ -516,6 +545,15 @@ export class ClockifyWriter implements INodeType {
 				const currProject = this.getNodeParameter('project', itemIndex) as string;
 				let project = await findProjectByName.call(this, currWorkspaceId, currProject, currClientId);
 				let timeEntryRequest : ITimeEntryRequest;
+=======
+				}else {
+					result = tag;
+				}
+			} else if( resource === 'timeEntry'){
+				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
+				const projectCurrent = this.getNodeParameter('project', itemIndex) as string;
+				let project = await findProjectByName.call(this, currWorkspaceId, projectCurrent, currClientId);
+>>>>>>> Edited ClockifyWriter to add Tag creation
 
 				if ( operation === 'create' ) {
 					const currProjectId = (project as IProjectDto).id;
