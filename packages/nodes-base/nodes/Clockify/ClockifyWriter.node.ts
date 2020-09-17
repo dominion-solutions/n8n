@@ -2,13 +2,16 @@ import {IExecuteFunctions, IExecuteSingleFunctions} from 'n8n-core';
 import {
 	IDataObject,
 	ILoadOptionsFunctions,
-	INodeExecutionData, INodePropertyOptions,
+	INodeExecutionData,
+	INodePropertyOptions,
+	INodeProperties,
 	INodeType,
 	INodeTypeDescription,
+	INodeParameters,
 } from 'n8n-workflow';
 
 import {
-	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag
+	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag, createTimeEntry
 } from './GenericFunctions';
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
@@ -237,7 +240,7 @@ export class ClockifyWriter implements INodeType {
 				name: 'taskId',
 				type: 'options',
 				typeOptions: {
-					loadOptionsDependsOn: ['projectName'],
+					loadOptionsDependsOn: ['project'],
 					loadOptionsMethod: 'loadTasksForProject',
 				},
 				required: false,
@@ -336,6 +339,7 @@ export class ClockifyWriter implements INodeType {
 				if (undefined !== workspaceId) {
 					const resource = `workspaces/${workspaceId}/users`;
 					const users: IUserDto[] = await clockifyApiRequest.call(this, 'GET', resource);
+					// const user: IUserDto = await clockifyApiRequest.call(this, 'GET', '/user');
 					if (undefined !== users) {
 						users.forEach(value => {
 							rtv.push(
@@ -345,6 +349,11 @@ export class ClockifyWriter implements INodeType {
 								});
 						});
 					}
+					// rtv.push(
+					// 	{
+					// 		name: user.name,
+					// 		value: user.id,
+					// 	});
 				}
 				return rtv;
 			},
@@ -405,7 +414,7 @@ export class ClockifyWriter implements INodeType {
 			async loadTasksForProject(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const rtv: INodePropertyOptions[] = [];
 				const workspaceId = this.getCurrentNodeParameter('workspaceId') as number;
-				const projectName = this.getCurrentNodeParameter('projectName') as string;
+				const projectName = this.getCurrentNodeParameter('project') as string;
 				const clientId = this.getCurrentNodeParameter('clientId') as string;
 
 				const project = await findProjectByName.call(this, workspaceId, projectName, clientId);
@@ -497,38 +506,38 @@ export class ClockifyWriter implements INodeType {
 				}
 			} else if( resource === 'timeEntry'){
 				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
-				const projectCurrent = this.getNodeParameter('project', itemIndex) as string;
-				let project = await findProjectByName.call(this, currWorkspaceId, projectCurrent, currClientId);
+				const currProject = this.getNodeParameter('project', itemIndex) as string;
+				let project = await findProjectByName.call(this, currWorkspaceId, currProject, currClientId);
 
 				if ( operation === 'create' ) {
-					// const currProjectId = (project as IProjectDto).id;
+					const currProjectId = (project as IProjectDto).id;
 
-					// timeEntryRequest = {
-					// 	id: '',
-					// 	description: this.getNodeParameter('description', itemIndex) as string,
-					// 	billable: isBillable,
-					// 	projectId: currProjectId,
-					// 	isLocked: false,
-					// 	userId: this.getNodeParameter('userId', itemIndex) as string,
-					// 	workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
-					// 	start: this.getNodeParameter('start', itemIndex) as string,
-					// 	end: this.getNodeParameter('end', itemIndex) as string,
-					// 	timeInterval: {
-					// 		start: this.getNodeParameter('start', itemIndex) as string,
-					// 		end: this.getNodeParameter('end', itemIndex) as string,
-					// 	},
-					// };
+					timeEntryRequest = {
+						id: '',
+						description: this.getNodeParameter('description', itemIndex) as string,
+						billable: isBillable,
+						projectId: currProjectId,
+						isLocked: false,
+						userId: this.getNodeParameter('userId', itemIndex) as string,
+						workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
+						start: this.getNodeParameter('start', itemIndex) as string,
+						end: this.getNodeParameter('end', itemIndex) as string,
+						timeInterval: {
+							start: this.getNodeParameter('start', itemIndex) as string,
+							end: this.getNodeParameter('end', itemIndex) as string,
+						},
+					};
 
-					// const currTagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
-					// const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
-					// if (currTagIds.length !== 0){
-					// 	timeEntryRequest.tagIds = currTagIds;
-					// }
-					// if( currTaskId.length !== 0) {
-					// 	timeEntryRequest.taskId = currTaskId as string;
-					// }
-					// const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/time-entries`, timeEntryRequest);
-					// // result.push(timeEntry);
+					const currTagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
+					const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
+					if (currTagIds.length !== 0){
+						timeEntryRequest.tagIds = currTagIds;
+					}
+					if( currTaskId.length !== 0) {
+						timeEntryRequest.taskId = currTaskId as string;
+					}
+
+					result = await createTimeEntry.call(this, timeEntryRequest);
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
