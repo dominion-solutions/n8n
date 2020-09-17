@@ -9,6 +9,7 @@ import { IDataObject, INodeExecutionData } from 'n8n-workflow';
 import {IProjectDto} from "./ProjectInterfaces";
 import {ITagDto} from "./CommonDtos";
 import {find} from "lodash";
+import { ITimeEntryRequest } from './TimeEntryInterfaces';
 
 export async function clockifyApiRequest(this: ILoadOptionsFunctions | IPollFunctions | IExecuteFunctions, method: string, resource: string, body: any = {}, qs: IDataObject = {}, uri?: string, option: IDataObject = {}): Promise<any> { // tslint:disable-line:no-any
 	const credentials = this.getCredentials('clockifyApi');
@@ -81,4 +82,9 @@ export async function createProject(this:IExecuteFunctions, project: IProjectDto
 export async function createTag(this:IExecuteFunctions, tag: ITagDto ): Promise<INodeExecutionData> {
 	const resource = `workspaces/${tag.workspaceId}/tags`;
 	return await clockifyApiRequest.call(this, 'POST', resource, tag);
+}
+
+export async function createTimeEntry(this:IExecuteFunctions, timeEntry: ITimeEntryRequest ): Promise<INodeExecutionData> {
+	const resource = `workspaces/${timeEntry.workspaceId}/time-entries`;
+	return await clockifyApiRequest.call(this, 'POST', resource, timeEntry);
 }
