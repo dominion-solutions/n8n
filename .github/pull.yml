@@ -11,7 +11,7 @@ rules:                      # Array of rules
       - spam-n-eggs
       - Sou1Aced
     conflictReviewers:      # Optional, on merge conflict assign a reviewer
-      - spam-n-eggs
+			- spam-n-eggs
 			- Sou1Aced
 	- base: develop
 		upstream: master
