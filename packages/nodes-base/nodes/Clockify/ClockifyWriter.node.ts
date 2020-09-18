@@ -1,4 +1,4 @@
-import {IExecuteFunctions, IExecuteSingleFunctions} from 'n8n-core';
+import {IExecuteFunctions} from 'n8n-core';
 import {
 	IDataObject,
 	ILoadOptionsFunctions,
@@ -127,9 +127,10 @@ export class ClockifyWriter implements INodeType {
 				default: [],
 				description: 'Project to associate with, leaving blank will use the project associated with the task.',
 				displayOptions: {
-					show: {
+					hide: {
 						resource: [
-							'timeEntry',
+							'project',
+							'tag',
 						],
 					},
 				}
@@ -463,11 +464,14 @@ export class ClockifyWriter implements INodeType {
 
 				}else if ( operation === 'delete' ) {
 
-				}else {
+				}else{
 					result.push(project);
 				}
 			} else if( resource === 'tag'){
 				const tagName = this.getNodeParameter('tagName', itemIndex) as string;
+				if (!tagName){
+					continue;
+				}
 				let tag = await findTagByName.call(this, currWorkspaceId, tagName);
 
 				if ( operation === 'create' && !tag) {
@@ -483,7 +487,7 @@ export class ClockifyWriter implements INodeType {
 
 				}else if ( operation === 'delete' ) {
 
-				}else {
+				}else{
 					result.push(tag);
 				}
 			} else if( resource === 'timeEntry'){

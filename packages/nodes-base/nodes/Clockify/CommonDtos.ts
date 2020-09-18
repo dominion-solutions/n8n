@@ -20,7 +20,7 @@ export interface IMembershipDto {
 
 export interface ITagDto {
 	id: string;
-	name: string;
+	name: any;
 	workspaceId: string;
 }
 

@@ -213,15 +213,7 @@
       "dist/nodes/ClickUp/ClickUp.node.js",
       "dist/nodes/ClickUp/ClickUpTrigger.node.js",
       "dist/nodes/Clockify/ClockifyTrigger.node.js",
-<<<<<<< HEAD
-<<<<<<< HEAD
       "dist/nodes/Clockify/ClockifyWriter.node.js",
-=======
-            "dist/nodes/Clockify/NewClockifyEntry.node.js",
->>>>>>> Fixed Project finding issue
-=======
-      "dist/nodes/Clockify/ClockifyWriter.node.js",
->>>>>>> Changed Project create in ClockifyWriter
       "dist/nodes/Cockpit/Cockpit.node.js",
       "dist/nodes/Coda/Coda.node.js",
       "dist/nodes/Contentful/Contentful.node.js",
