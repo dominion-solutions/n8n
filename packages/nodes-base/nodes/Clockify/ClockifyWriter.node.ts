@@ -127,14 +127,10 @@ export class ClockifyWriter implements INodeType {
 				default: [],
 				description: 'Project to associate with, leaving blank will use the project associated with the task.',
 				displayOptions: {
-					show: {
+					hide: {
 						resource: [
-<<<<<<< HEAD
 							'project',
 							'tag',
-=======
-							'timeEntry',
->>>>>>> 930f2f7c730421d5f515b725c719b12884290114
 						],
 					},
 				}
