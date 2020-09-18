@@ -1,4 +1,4 @@
-import {IExecuteFunctions} from 'n8n-core';
+import {IExecuteFunctions, IExecuteSingleFunctions} from 'n8n-core';
 import {
 	IDataObject,
 	ILoadOptionsFunctions,
@@ -8,7 +8,7 @@ import {
 } from 'n8n-workflow';
 
 import {
-	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag
+	clockifyApiRequest, createProject, findProjectByName,
 } from './GenericFunctions';
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
@@ -19,18 +19,17 @@ import {ITagDto} from "./CommonDtos";
 import {ITimeEntryDto, ITimeEntryRequest} from "./TimeEntryInterfaces";
 import {stringify} from "querystring";
 import {callbackify} from "util";
-import { goalKeyResultFields } from '../ClickUp/GoalKeyResultDescription';
 
-export class ClockifyWriter implements INodeType {
+export class NewClockifyEntry implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Clockify',
-		name: 'clockifyWriter',
+		displayName: 'New Clockify Entry',
+		name: 'newClockifyEntry',
 		icon: 'file:clockify.png',
 		group: ['transform'],
 		version: 1,
-		description: 'Access data on Clockify',
+		description: 'Adds a new clockify time entry',
 		defaults: {
-			name: 'Clockify',
+			name: 'New Clockify Entry',
 			color: '#772244',
 		},
 		inputs: ['main'],
@@ -42,40 +41,6 @@ export class ClockifyWriter implements INodeType {
 			}
 		],
 		properties: [
-			{
-				displayName: 'Operation',
-				name: 'operation',
-				type: 'options',
-				options: [
-					{
-						name: 'Create',
-						value: 'create'
-					},
-				],
-				default: 'create',
-				description: 'The operation you wish to carry out.',
-			},
-			{
-				displayName: 'Resource',
-				name: 'resource',
-				type: 'options',
-				options: [
-					{
-						name: 'Project',
-						value: 'project'
-					},
-					{
-						name: 'Tag',
-						value: 'tag'
-					},
-					{
-						name: 'Time Entry',
-						value: 'timeEntry'
-					},
-				],
-				default: 'project',
-				description: 'The resource to operate on.',
-			},
 			{
 				displayName: 'Workspace',
 				name: 'workspaceId',
@@ -96,13 +61,6 @@ export class ClockifyWriter implements INodeType {
 				},
 				required: true,
 				default: [],
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
 			},
 			{
 				displayName: 'Client',
@@ -117,7 +75,7 @@ export class ClockifyWriter implements INodeType {
 			},
 			{
 				displayName: 'Project',
-				name: 'project',
+				name: 'projectName',
 				type: 'options',
 				typeOptions: {
 					loadOptionsDependsOn: ['workspaceId'],
@@ -125,110 +83,15 @@ export class ClockifyWriter implements INodeType {
 				},
 				required: true,
 				default: [],
-				description: 'Project to associate with, leaving blank will use the project associated with the task.',
-				displayOptions: {
-					show: {
-						resource: [
-<<<<<<< HEAD
-							'project',
-							'tag',
-=======
-							'timeEntry',
->>>>>>> 930f2f7c730421d5f515b725c719b12884290114
-						],
-					},
-				}
-			},
-			{
-				displayName: 'Billable',
-				name: 'billable',
-				type: 'boolean',
-				required: true,
-				default: false,
-				displayOptions: {
-					hide: {
-						resource: [
-							'tag',
-						],
-					},
-				}
-			},
-			//Project Properties
-			{
-				displayName: 'Project Name',
-				name: 'projectName',
-				type: 'string',
-				required: true,
-				default: '',
-				description: 'Name of project being created.',
-				displayOptions: {
-					show: {
-						resource: [
-							'project',
-						],
-					},
-				}
+				description: 'Project to associate with, leaving blank will use the project associated with the task',
 			},
 			{
 				displayName: 'Project Color',
 				name: 'color',
-				type: "color",
-				required: true,
-				default: '#0000FF',
-				displayOptions: {
-					show: {
-						resource: [
-							'project',
-						],
-					},
-				}
-			},
-			{
-				displayName: 'Public',
-				name: 'isPublic',
-				type: 'boolean',
-				required: true,
-				default: false,
-				displayOptions: {
-					show: {
-						resource: [
-							'project',
-						],
-					},
-				}
-			},
-			{
-				displayName: 'Note',
-				name: 'projectNote',
-				type: 'string',
+				type: "string",
 				required: false,
-				default: '',
-				description: 'Note about the project. (OPTIONAL)',
-				displayOptions: {
-					show: {
-						resource: [
-							'project',
-						],
-					},
-				}
+				default: '#0000FF'
 			},
-			//Tag Properties
-			{
-				displayName: 'Tag Name',
-				name: 'tagName',
-				type: 'string',
-				required: true,
-				default: '',
-				description: 'Name of tag being created.',
-				displayOptions: {
-					show: {
-						resource: [
-							'tag',
-						],
-					},
-				},
-			},
-			//Time Entry Properties
 			{
 				displayName: "Task",
 				name: 'taskId',
@@ -239,13 +102,6 @@ export class ClockifyWriter implements INodeType {
 				},
 				required: false,
 				default: [],
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
 			},
 			{
 				displayName: "Tags",
@@ -257,13 +113,6 @@ export class ClockifyWriter implements INodeType {
 				},
 				required: false,
 				default: [],
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
 			},
 			{
 				displayName: 'Start',
@@ -271,13 +120,6 @@ export class ClockifyWriter implements INodeType {
 				type: 'dateTime',
 				required: true,
 				default: '',
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
 			},
 			{
 				displayName: 'End',
@@ -285,29 +127,21 @@ export class ClockifyWriter implements INodeType {
 				type: 'dateTime',
 				required: true,
 				default: '',
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
+			},
+			{
+				displayName: 'Billable?',
+				name: 'billable',
+				type: 'boolean',
+				required: true,
+				default: false,
 			},
 			{
 				displayName: 'Description',
 				name: 'description',
 				type: 'string',
 				required: false,
-				default: '',
-				displayOptions: {
-					show: {
-						resource: [
-							'timeEntry',
-						],
-					},
-				},
+				default: ''
 			},
-
 		]
 	};
 
@@ -424,87 +258,70 @@ export class ClockifyWriter implements INodeType {
 		},
 	};
 
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | null> {
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 
 		const items = this.getInputData();
-		const result: any[] = []
+		const timeEntries : INodeExecutionData[] = [];
+		let timeEntryRequest : ITimeEntryRequest;
 		// Itterates over all input items and add the key "myString" with the
 		// value the parameter "myString" resolves to.
 		//  (This could be a different value for each item in case it contains an expression)
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 			const currWorkspaceId = this.getNodeParameter('workspaceId', itemIndex) as number;
+			const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
+			const projectName = this.getNodeParameter('projectName', itemIndex) as string;
 			const currClientId = this.getNodeParameter('clientId', itemIndex) as string;
-			const operation = this.getNodeParameter('operation', itemIndex) as string;
-			const resource = this.getNodeParameter('resource', itemIndex) as string;
-
-			if ( resource === 'project' ) {
-				const isBillable = this.getNodeParameter('billable', itemIndex) as boolean;
-				const projectName = this.getNodeParameter('projectName', itemIndex) as string;
-				const isPublic = this.getNodeParameter('isPublic', itemIndex) as boolean;
-				const projectNote = this.getNodeParameter('projectNote', itemIndex) as string;
-				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
-
-				if ( operation === 'create' && !project) {
-					project = {
-						clientName: "",
-						color: this.getNodeParameter('color', itemIndex) as string,
-						duration: "",
-						estimate: undefined,
-						hourlyRate: undefined,
-						id: "",
-						memberships: undefined,
-						name: projectName,
-						isPublic: isPublic,
-						archived: false,
-						billable: isBillable,
-						clientId: currClientId,
-						workspaceId: currWorkspaceId.toString(),
-						note: projectNote,
-					};
-
-					result.push(await createProject.call(this, project));
-					console.log(`Project Created: ${result}`);
-				}else if ( operation === 'update' ) {
-
-				}else if ( operation === 'delete' ) {
-
-				}else{
-					result.push(project);
-				}
-			} else if( resource === 'tag'){
-				const tagName = this.getNodeParameter('tagName', itemIndex) as string;
-				if (!tagName){
-					continue;
-				}
-				let tag = await findTagByName.call(this, currWorkspaceId, tagName);
-
-				if ( operation === 'create' && !tag) {
-					tag = {
-						id: "",
-						name: tagName,
-						workspaceId: currWorkspaceId.toString()
-					}
-
-					result.push(await createTag.call(this, tag));
-					console.log(`Tag Created: ${result}`);
-				}else if ( operation === 'update' ) {
-
-				}else if ( operation === 'delete' ) {
-
-				}else{
-					result.push(tag);
-				}
-			} else if( resource === 'timeEntry'){
-				if ( operation === 'create' ) {
-
-				}else if ( operation === 'update' ) {
-
-				}else if ( operation === 'delete' ) {
-
-				}
+			let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
+			if ( project === undefined ||  (project as IProjectDto).id === undefined) {
+				project = {
+					clientName: "",
+					color: this.getNodeParameter('color', itemIndex, '#FFFFFF') as string,
+					duration: "",
+					estimate: undefined,
+					hourlyRate: undefined,
+					id: "",
+					memberships: undefined,
+					name: projectName,
+					isPublic: false,
+					archived: false,
+					billable: isBillable,
+					clientId: currClientId,
+					workspaceId: currWorkspaceId.toString(),
+					note: "",
+				};
+				const projects : INodeExecutionData = await createProject.call(this, project);
+				console.log(`Project Created: ${project}`);
 			}
-		}
 
-		return [this.helpers.returnJsonArray(result)];
+			const currProjectId = (project as IProjectDto).id;
+
+			timeEntryRequest = {
+				id: '',
+				description: this.getNodeParameter('description', itemIndex) as string,
+				billable: isBillable,
+				projectId: currProjectId,
+				isLocked: false,
+				userId: this.getNodeParameter('userId', itemIndex) as string,
+				workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
+				start: this.getNodeParameter('start', itemIndex) as string,
+				end: this.getNodeParameter('end', itemIndex) as string,
+				timeInterval: {
+					start: this.getNodeParameter('start', itemIndex) as string,
+					end: this.getNodeParameter('end', itemIndex) as string,
+				},
+			};
+
+			const currTagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
+			const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
+			if (currTagIds.length !== 0){
+				timeEntryRequest.tagIds = currTagIds;
+			}
+			if( currTaskId.length !== 0) {
+				timeEntryRequest.taskId = currTaskId as string;
+			}
+			const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/time-entries`, timeEntryRequest);
+			timeEntries.push(timeEntry);
+		}
+		return this.prepareOutputData(timeEntries);
 	}
 }
