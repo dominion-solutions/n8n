@@ -51,14 +51,6 @@ export class ClockifyWriter implements INodeType {
 						name: 'Create',
 						value: 'create'
 					},
-					{
-						name: 'Update',
-						value: 'update'
-					},
-					{
-						name: 'Delete',
-						value: 'delete'
-					},
 				],
 				default: 'create',
 				description: 'The operation you wish to carry out.',
@@ -143,7 +135,7 @@ export class ClockifyWriter implements INodeType {
 				}
 			},
 			{
-				displayName: 'Billable?',
+				displayName: 'Billable',
 				name: 'billable',
 				type: 'boolean',
 				required: true,
@@ -187,7 +179,7 @@ export class ClockifyWriter implements INodeType {
 				}
 			},
 			{
-				displayName: 'Public?',
+				displayName: 'Public',
 				name: 'isPublic',
 				type: 'boolean',
 				required: true,
@@ -427,11 +419,10 @@ export class ClockifyWriter implements INodeType {
 		},
 	};
 
-	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][] | null> {
 
 		const items = this.getInputData();
-		let result : any;
-		let timeEntryRequest : ITimeEntryRequest;
+		const result: any[] = []
 		// Itterates over all input items and add the key "myString" with the
 		// value the parameter "myString" resolves to.
 		//  (This could be a different value for each item in case it contains an expression)
@@ -466,14 +457,14 @@ export class ClockifyWriter implements INodeType {
 						note: projectNote,
 					};
 
-					result = await createProject.call(this, project);
+					result.push(await createProject.call(this, project));
 					console.log(`Project Created: ${result}`);
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
 
 				}else {
-					result = project;
+					result.push(project);
 				}
 			} else if( resource === 'tag'){
 				if ( operation === 'create' ) {
@@ -484,37 +475,8 @@ export class ClockifyWriter implements INodeType {
 
 				}
 			} else if( resource === 'timeEntry'){
-				let project = await findProjectByName.call(this, currWorkspaceId, projectName, currClientId);
-
 				if ( operation === 'create' ) {
-					// const currProjectId = (project as IProjectDto).id;
 
-					// timeEntryRequest = {
-					// 	id: '',
-					// 	description: this.getNodeParameter('description', itemIndex) as string,
-					// 	billable: isBillable,
-					// 	projectId: currProjectId,
-					// 	isLocked: false,
-					// 	userId: this.getNodeParameter('userId', itemIndex) as string,
-					// 	workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
-					// 	start: this.getNodeParameter('start', itemIndex) as string,
-					// 	end: this.getNodeParameter('end', itemIndex) as string,
-					// 	timeInterval: {
-					// 		start: this.getNodeParameter('start', itemIndex) as string,
-					// 		end: this.getNodeParameter('end', itemIndex) as string,
-					// 	},
-					// };
-
-					// const currTagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
-					// const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
-					// if (currTagIds.length !== 0){
-					// 	timeEntryRequest.tagIds = currTagIds;
-					// }
-					// if( currTaskId.length !== 0) {
-					// 	timeEntryRequest.taskId = currTaskId as string;
-					// }
-					// const timeEntry : INodeExecutionData = await clockifyApiRequest.call(this, 'POST', `workspaces/${currWorkspaceId}/time-entries`, timeEntryRequest);
-					// // result.push(timeEntry);
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
@@ -523,7 +485,6 @@ export class ClockifyWriter implements INodeType {
 			}
 		}
 
-		result = [this.helpers.returnJsonArray(result)];
-		return result;
+		return [this.helpers.returnJsonArray(result)];
 	}
 }
