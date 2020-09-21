@@ -18,7 +18,7 @@ import {IProjectDto, ITaskDto} from "./ProjectInterfaces";
 import {ITagDto} from "./CommonDtos";
 import {ITimeEntryDto, ITimeEntryRequest} from "./TimeEntryInterfaces";
 import {stringify} from "querystring";
-import {callbackify} from "util";
+import {callbackify, isArray} from "util";
 import { goalKeyResultFields } from '../ClickUp/GoalKeyResultDescription';
 
 export class ClockifyWriter implements INodeType {
@@ -468,27 +468,42 @@ export class ClockifyWriter implements INodeType {
 					result.push(project);
 				}
 			} else if( resource === 'tag'){
-				const tagName = this.getNodeParameter('tagName', itemIndex) as string;
+				const tagName = this.getNodeParameter('tagName', itemIndex) as [];
+				let tagsArr : ITagDto[] = [];
 				if (!tagName){
 					continue;
-				}
-				let tag = await findTagByName.call(this, currWorkspaceId, tagName);
-
-				if ( operation === 'create' && !tag) {
-					tag = {
+				}else if(!isArray(tagName)){
+					let tag = {
 						id: "",
 						name: tagName,
-						workspaceId: currWorkspaceId.toString()
+						workspaceId: currWorkspaceId.toString(),
+						archived: false
 					}
-
-					result.push(await createTag.call(this, tag));
-					console.log(`Tag Created: ${result}`);
-				}else if ( operation === 'update' ) {
-
-				}else if ( operation === 'delete' ) {
-
+					tagsArr.push(tag);
 				}else{
-					result.push(tag);
+					tagsArr = tagName;
+				}
+
+				for(let index = 0; index < tagsArr.length; index++){
+					let tag = await findTagByName.call(this, currWorkspaceId, tagsArr[index].name);
+
+					if ( operation === 'create' && !tag) {
+						tag = {
+							id: "",
+							name: tagsArr[index].name,
+							workspaceId: currWorkspaceId.toString(),
+							archived: false
+						}
+
+						result.push(await createTag.call(this, tag));
+						console.log(`Tag Created: ${result}`);
+					}else if ( operation === 'update' ) {
+
+					}else if ( operation === 'delete' ) {
+
+					}else{
+						result.push(tag);
+					}
 				}
 			} else if( resource === 'timeEntry'){
 				if ( operation === 'create' ) {

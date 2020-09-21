@@ -22,6 +22,7 @@ export interface ITagDto {
 	id: string;
 	name: any;
 	workspaceId: string;
+	archived: boolean;
 }
 
 export interface ITimeIntervalDto {
