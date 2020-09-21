@@ -12,9 +12,9 @@ export interface ITimeEntryRequest {
 	description: string;
 	projectId: string;
 	userId: string;
-	taskId?: string;
+	taskId?: string | null;
 	end: string;
-	tagIds?: string[];
+	tagIds?: string[] | undefined;
 	timeInterval: ITimeEntriesDurationRequest;
 	workspaceId: string;
 	isLocked: boolean;
