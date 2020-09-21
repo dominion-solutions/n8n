@@ -332,7 +332,6 @@ export class ClockifyWriter implements INodeType {
 				if (undefined !== workspaceId) {
 					const resource = `workspaces/${workspaceId}/users`;
 					const users: IUserDto[] = await clockifyApiRequest.call(this, 'GET', resource);
-					// const user: IUserDto = await clockifyApiRequest.call(this, 'GET', '/user');
 					if (undefined !== users) {
 						users.forEach(value => {
 							rtv.push(
@@ -342,11 +341,6 @@ export class ClockifyWriter implements INodeType {
 								});
 						});
 					}
-					// rtv.push(
-					// 	{
-					// 		name: user.name,
-					// 		value: user.id,
-					// 	});
 				}
 				return rtv;
 			},
@@ -530,6 +524,7 @@ export class ClockifyWriter implements INodeType {
 						projectId: currProjectId,
 						isLocked: false,
 						userId: this.getNodeParameter('userId', itemIndex) as string,
+						tagIds: [],
 						workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
 						start: this.getNodeParameter('start', itemIndex) as string,
 						end: this.getNodeParameter('end', itemIndex) as string,
@@ -539,16 +534,23 @@ export class ClockifyWriter implements INodeType {
 						},
 					};
 
-					const currTagIds = this.getNodeParameter('tagIds', itemIndex, []) as string[];
+					const currTagIds :ITagDto[] = this.getNodeParameter('tagIds', itemIndex, []) as ITagDto[];
 					const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
-					if (currTagIds.length !== 0){
-						timeEntryRequest.tagIds = currTagIds;
+					if ( currTagIds && currTagIds.length !== 0){
+						for(let index = 0; index < currTagIds.length; index++){
+							console.log(`Tag: ${currTagIds[index].name}`);
+							let tag = await findTagByName.call(this, currWorkspaceId, currTagIds[index].name);
+							if( tag ) {
+								timeEntryRequest.tagIds?.push(tag.id);
+							}
+						}
 					}
-					if( currTaskId.length !== 0) {
+					if( currTaskId ) {
 						timeEntryRequest.taskId = currTaskId as string;
 					}
-
 					result.push(await createTimeEntry.call(this, timeEntryRequest));
+					console.log(`Time Entry Created: ${result}`);
+					console.log(`Tags Added: ${timeEntryRequest.tagIds}`);
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
