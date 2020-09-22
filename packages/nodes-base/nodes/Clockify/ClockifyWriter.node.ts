@@ -509,7 +509,6 @@ export class ClockifyWriter implements INodeType {
 
 				if ( operation === 'create' ) {
 					const currProjectId = (project as IProjectDto).id;
-<<<<<<< HEAD
 
 					timeEntryRequest = {
 						id: '',
@@ -528,34 +527,10 @@ export class ClockifyWriter implements INodeType {
 						},
 					};
 
-=======
-
-					timeEntryRequest = {
-						id: '',
-						description: this.getNodeParameter('description', itemIndex) as string,
-						billable: isBillable,
-						projectId: currProjectId,
-						isLocked: false,
-						userId: this.getNodeParameter('userId', itemIndex) as string,
-						tagIds: [],
-						workspaceId: this.getNodeParameter('workspaceId', itemIndex) as string,
-						start: this.getNodeParameter('start', itemIndex) as string,
-						end: this.getNodeParameter('end', itemIndex) as string,
-						timeInterval: {
-							start: this.getNodeParameter('start', itemIndex) as string,
-							end: this.getNodeParameter('end', itemIndex) as string,
-						},
-					};
-
->>>>>>> 1044a2756f6885041b32927c22296ecbf9fb2b13
 					const currTagIds :ITagDto[] = this.getNodeParameter('tagIds', itemIndex, []) as ITagDto[];
 					const currTaskId = this.getNodeParameter('taskId', itemIndex, undefined) as string;
 					if ( currTagIds && currTagIds.length !== 0){
 						for(let index = 0; index < currTagIds.length; index++){
-<<<<<<< HEAD
-=======
-							console.log(`Tag: ${currTagIds[index].name}`);
->>>>>>> 1044a2756f6885041b32927c22296ecbf9fb2b13
 							let tag = await findTagByName.call(this, currWorkspaceId, currTagIds[index].name);
 							if( tag ) {
 								timeEntryRequest.tagIds?.push(tag.id);
@@ -566,11 +541,6 @@ export class ClockifyWriter implements INodeType {
 						timeEntryRequest.taskId = currTaskId as string;
 					}
 					result.push(await createTimeEntry.call(this, timeEntryRequest));
-<<<<<<< HEAD
-=======
-					console.log(`Time Entry Created: ${result}`);
-					console.log(`Tags Added: ${timeEntryRequest.tagIds}`);
->>>>>>> 1044a2756f6885041b32927c22296ecbf9fb2b13
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
