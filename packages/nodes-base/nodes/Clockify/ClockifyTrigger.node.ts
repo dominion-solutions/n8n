@@ -118,7 +118,6 @@ export class ClockifyTrigger implements INodeType {
 
 		if (Array.isArray(result) && result.length !== 0) {
 			result = [this.helpers.returnJsonArray(result)];
-			return result;
 		}
 		return result;
 	}
