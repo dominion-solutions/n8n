@@ -1,4 +1,5 @@
 import {IHourlyRateDto, IMembershipDto} from "./CommonDtos";
+import { INodeExecutionData } from "n8n-workflow";
 
 enum EstimateEnum {
 	AUTO = "AUTO",
