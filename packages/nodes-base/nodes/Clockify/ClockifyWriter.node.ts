@@ -1,13 +1,10 @@
 import {IExecuteFunctions} from 'n8n-core';
 import {
-	IDataObject,
 	ILoadOptionsFunctions,
 	INodeExecutionData,
 	INodePropertyOptions,
-	INodeProperties,
 	INodeType,
 	INodeTypeDescription,
-	INodeParameters,
 } from 'n8n-workflow';
 
 import {
@@ -16,13 +13,11 @@ import {
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
 import {IUserDto} from "./UserDtos";
-import {runInThisContext} from "vm";
 import {IProjectDto, ITaskDto} from "./ProjectInterfaces";
 import {ITagDto} from "./CommonDtos";
-import {ITimeEntryDto, ITimeEntryRequest} from "./TimeEntryInterfaces";
-import {stringify} from "querystring";
-import {callbackify, isArray} from "util";
-import { goalKeyResultFields } from '../ClickUp/GoalKeyResultDescription';
+import {ITimeEntryRequest} from "./TimeEntryInterfaces";
+import {isArray} from "util";
+
 
 export class ClockifyWriter implements INodeType {
 	description: INodeTypeDescription = {
