@@ -47,10 +47,8 @@ export async function clockifyApiRequest(this: ILoadOptionsFunctions | IPollFunc
 export async function findProjectByName(this: IExecuteFunctions | ILoadOptionsFunctions, workspaceId: number, projectName: string, clientId: string): Promise<IProjectDto | undefined> {
 	const resource = `workspaces/${workspaceId}/projects`;
 	const qs: IDataObject = {};
-	//Clockify requires replacing spaces with +
 	qs.name = projectName.trim().replace(/\s/g, '+');
 
-	//For the life of me, I cannot figure out why the query string never gets processed if I pass it in in the qs variable
 	let result = await clockifyApiRequest.call(this, 'GET', `${resource}?name=${qs.name}`);
 	result = find(result,
 		{
