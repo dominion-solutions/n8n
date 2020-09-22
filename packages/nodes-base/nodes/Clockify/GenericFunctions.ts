@@ -68,7 +68,6 @@ export async function findTagByName(this: IExecuteFunctions | ILoadOptionsFuncti
 			return tag;
 		}
 	}
-
 	return tag;
 }
 
