@@ -1,4 +1,5 @@
 import {IHourlyRateDto, IMembershipDto} from "./CommonDtos";
+import { INodeExecutionData } from "n8n-workflow";
 
 enum EstimateEnum {
 	AUTO = "AUTO",
@@ -10,7 +11,7 @@ interface IEstimateDto {
 	type: EstimateEnum;
 }
 
-export interface IProjectDto {
+export interface IProjectDto{
 	archived: boolean;
 	billable: boolean;
 	clientId: string;
@@ -22,8 +23,9 @@ export interface IProjectDto {
 	id: string;
 	memberships: IMembershipDto[] | undefined;
 	name: string;
-	public: boolean;
+	isPublic: boolean;
 	workspaceId: string;
+	note: string | undefined;
 }
 
 export interface IProjectRequest {
