@@ -8,27 +8,16 @@ import {
 } from 'n8n-workflow';
 
 import {
-<<<<<<< HEAD
 	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag, createTimeEntry
-=======
-	clockifyApiRequest, createProject, findProjectByName, findTagByName, createTag
->>>>>>> e1a658b7b8a94e351bbd7d27212a01e276628d41
 } from './GenericFunctions';
 
 import {IClientDto, IWorkspaceDto} from "./WorkpaceInterfaces";
 import {IUserDto} from "./UserDtos";
 import {IProjectDto, ITaskDto} from "./ProjectInterfaces";
 import {ITagDto} from "./CommonDtos";
-<<<<<<< HEAD
 import {ITimeEntryRequest} from "./TimeEntryInterfaces";
 import {isArray} from "util";
 
-=======
-import {ITimeEntryDto, ITimeEntryRequest} from "./TimeEntryInterfaces";
-import {stringify} from "querystring";
-import {callbackify, isArray} from "util";
-import { goalKeyResultFields } from '../ClickUp/GoalKeyResultDescription';
->>>>>>> e1a658b7b8a94e351bbd7d27212a01e276628d41
 
 export class ClockifyWriter implements INodeType {
 	description: INodeTypeDescription = {
@@ -468,10 +457,6 @@ export class ClockifyWriter implements INodeType {
 					};
 
 					result.push(await createProject.call(this, project));
-<<<<<<< HEAD
-=======
-					console.log(`Project Created: ${result}`);
->>>>>>> e1a658b7b8a94e351bbd7d27212a01e276628d41
 				}else if ( operation === 'update' ) {
 
 				}else if ( operation === 'delete' ) {
